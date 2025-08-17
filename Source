@@ -1,0 +1,37 @@
+using UnityEngine;
+using System.Collections.Generic;
+
+namespace NetworkLagSmoother
+{
+    public class LagReducer
+    {
+        // Interpolation speed (higher = snappier)
+        private float lerpSpeed;
+
+        // Stores target positions for each object
+        private Dictionary<int, Vector3> targetPositions = new Dictionary<int, Vector3>();
+
+        public LagReducer(float lerpSpeed = 10f)
+        {
+            this.lerpSpeed = lerpSpeed;
+        }
+
+        /// <summary>
+        /// Call this every frame to get a smoothed position for a networked object.
+        /// </summary>
+        /// <param name="objectId">Unique ID for the object</param>
+        /// <param name="currentPosition">Current local position</param>
+        /// <param name="receivedPosition">Latest position from network</param>
+        /// <returns>Smoothed position</returns>
+        public Vector3 GetSmoothedPosition(int objectId, Vector3 currentPosition, Vector3 receivedPosition)
+        {
+            if (!targetPositions.ContainsKey(objectId))
+                targetPositions[objectId] = receivedPosition;
+
+            targetPositions[objectId] = receivedPosition;
+
+            // Smooth movement
+            return Vector3.Lerp(currentPosition, targetPositions[objectId], Time.deltaTime * lerpSpeed);
+        }
+    }
+}
